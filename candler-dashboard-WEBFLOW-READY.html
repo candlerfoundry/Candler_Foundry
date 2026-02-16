@@ -1,0 +1,2595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Candler Foundry - Executive Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #c84826;
+      --dark: #1e2530;
+      --cream: #fafaf2;
+      --primary-dark: #a83920;
+      --primary-light: #d46843;
+    }
+
+    body {
+      font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--cream);
+      color: var(--dark);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1a1f2e 0%, var(--dark) 100%);
+      padding: 2rem 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(200, 72, 38, 0.03));
+      pointer-events: none;
+    }
+
+    .header-content {
+      max-width: 1800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-container {
+      background: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+      height: 50px;
+      width: auto;
+      display: block;
+    }
+
+    .header-text h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 600;
+      color: white;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .header-text p {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      font-weight: 300;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Main Navigation */
+    .main-nav {
+      background: white;
+      border-bottom: 1px solid rgba(30, 37, 48, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .main-nav-content {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0 3rem;
+      display: flex;
+      gap: 0;
+    }
+
+    .main-nav-btn {
+      background: transparent;
+      border: none;
+      padding: 1.25rem 2rem;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--dark);
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      letter-spacing: 0.3px;
+    }
+
+    .main-nav-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: calc(100% - 2rem);
+      height: 3px;
+      background: var(--primary);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .main-nav-btn:hover {
+      color: var(--primary);
+    }
+
+    .main-nav-btn.active {
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .main-nav-btn.active::after {
+      transform: translateX(-50%) scaleX(1);
+    }
+
+    /* Sub Navigation */
+    .sub-nav {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(30, 37, 48, 0.06);
+      padding: 0.75rem 3rem;
+    }
+
+    .sub-nav-content {
+      max-width: 1800px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .sub-nav-btn {
+      background: transparent;
+      border: 1px solid rgba(30, 37, 48, 0.1);
+      padding: 0.5rem 1.25rem;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #6b7280;
+      cursor: pointer;
+      border-radius: 20px;
+      transition: all 0.2s;
+    }
+
+    .sub-nav-btn:hover {
+      background: white;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .sub-nav-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    /* Main Content */
+    .main {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 3rem 3rem 6rem;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .sub-content {
+      display: none;
+    }
+
+    .sub-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Cards and Grids */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.03);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(30, 37, 48, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-light));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .stat-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 16px 32px rgba(200, 72, 38, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #9ca3af;
+      margin-bottom: 0.75rem;
+    }
+
+    .stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.75rem;
+      font-weight: 700;
+      color: var(--dark);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      letter-spacing: -1px;
+    }
+
+    .stat-subtitle {
+      font-size: 0.9rem;
+      color: #6b7280;
+      font-weight: 400;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.03);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(30, 37, 48, 0.06);
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+    }
+
+    /* Lists */
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      background: var(--cream);
+      border-radius: 10px;
+      margin-bottom: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1px solid rgba(30, 37, 48, 0.04);
+    }
+
+    .list-item:hover {
+      background: white;
+      transform: translateX(6px);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-color: rgba(200, 72, 38, 0.2);
+    }
+
+    .list-item-content {
+      flex: 1;
+    }
+
+    .list-item-title {
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .list-item-meta {
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .list-item-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    /* Charts */
+    .chart-container {
+      position: relative;
+      height: 400px;
+      margin: 1.5rem 0;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    /* Hero Stats */
+    .hero-stat {
+      background: linear-gradient(135deg, var(--dark) 0%, #2a3240 100%);
+      border-radius: 16px;
+      padding: 3rem;
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      color: white;
+    }
+
+    .hero-stat::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(200, 72, 38, 0.15), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-stat-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      opacity: 0.7;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-stat-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4.5rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+      letter-spacing: -2px;
+    }
+
+    .hero-stat-subtitle {
+      font-size: 1.125rem;
+      opacity: 0.85;
+      font-weight: 300;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .header-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .logo-container {
+        margin: 0 auto;
+      }
+
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header,
+      .main-nav-content,
+      .sub-nav,
+      .main {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+
+      .stat-value {
+        font-size: 2.25rem;
+      }
+
+      .hero-stat-value {
+        font-size: 3.5rem;
+      }
+    }
+
+    /* TheoEd Event Cards */
+    .event-card {
+      background: white;
+      border: 1px solid rgba(30, 37, 48, 0.08);
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .event-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .event-header {
+      padding: 1.75rem 2rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, var(--cream) 0%, white 100%);
+      border-bottom: 1px solid rgba(30, 37, 48, 0.06);
+      transition: background 0.2s;
+    }
+
+    .event-header:hover {
+      background: white;
+    }
+
+    .event-header-content {
+      flex: 1;
+    }
+
+    .event-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .event-meta {
+      display: flex;
+      gap: 2rem;
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .event-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .event-expand-icon {
+      font-size: 1.5rem;
+      color: var(--primary);
+      transition: transform 0.3s;
+    }
+
+    .event-card.expanded .event-expand-icon {
+      transform: rotate(180deg);
+    }
+
+    .event-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .event-card.expanded .event-content {
+      max-height: 2000px;
+    }
+
+    .event-talks {
+      padding: 2rem;
+    }
+
+    .talk-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      background: var(--cream);
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      transition: all 0.3s;
+      border: 1px solid rgba(30, 37, 48, 0.04);
+    }
+
+    .talk-item:hover {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transform: translateX(4px);
+    }
+
+    .talk-info {
+      flex: 1;
+    }
+
+    .talk-title {
+      font-weight: 500;
+      color: var(--dark);
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .talk-speaker {
+      font-size: 0.85rem;
+      color: #6b7280;
+    }
+
+    .talk-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .talk-link:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(200, 72, 38, 0.3);
+    }
+
+    .talk-link svg {
+      width: 16px;
+      height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="logo-container">
+        <img src="Classic_Foundry_Logo.png" 
+             alt="The Candler Foundry" 
+             class="logo"
+             onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\'color:var(--primary);font-weight:700;font-size:1.5rem;padding:0.5rem;\'>The Candler Foundry</div>';">
+      </div>
+      <div class="header-text">
+        <h1>Executive Impact Dashboard</h1>
+        <p>Strategic Analytics & Performance Metrics</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation -->
+  <nav class="main-nav">
+    <div class="main-nav-content">
+      <button class="main-nav-btn active" onclick="showMainTab('courses')">Courses</button>
+      <button class="main-nav-btn" onclick="showMainTab('faculty')">Faculty</button>
+      <button class="main-nav-btn" onclick="showMainTab('partners')">Partners</button>
+      <button class="main-nav-btn" onclick="showMainTab('theoed')">TheoEd</button>
+      <button class="main-nav-btn" onclick="showMainTab('revenue')">Revenue</button>
+    </div>
+  </nav>
+
+  <!-- Sub Navigation (Dynamic per tab) -->
+  <div id="sub-nav-courses" class="sub-nav">
+    <div class="sub-nav-content">
+      <button class="sub-nav-btn active" onclick="showSubTab('courses', 'overview')">Overview</button>
+      <button class="sub-nav-btn" onclick="showSubTab('courses', 'participation')">Top by Participation</button>
+      <button class="sub-nav-btn" onclick="showSubTab('courses', 'revenue-leaders')">Revenue Leaders</button>
+      <button class="sub-nav-btn" onclick="showSubTab('courses', 'engagement')">Student Engagement</button>
+    </div>
+  </div>
+
+  <div id="sub-nav-faculty" class="sub-nav" style="display:none;">
+    <div class="sub-nav-content">
+      <button class="sub-nav-btn active" onclick="showSubTab('faculty', 'overview')">External Faculty</button>
+      <button class="sub-nav-btn" onclick="showSubTab('faculty', 'distribution')">Course Distribution</button>
+      <button class="sub-nav-btn" onclick="showSubTab('faculty', 'impact')">Impact Metrics</button>
+    </div>
+  </div>
+
+  <div id="sub-nav-partners" class="sub-nav" style="display:none;">
+    <div class="sub-nav-content">
+      <button class="sub-nav-btn active" onclick="showSubTab('partners', 'congregations')">Top Congregations</button>
+      <button class="sub-nav-btn" onclick="showSubTab('partners', 'denominations')">Denominations</button>
+      <button class="sub-nav-btn" onclick="showSubTab('partners', 'geographic')">Geographic Reach</button>
+    </div>
+  </div>
+
+  <div id="sub-nav-theoed" class="sub-nav" style="display:none;">
+    <div class="sub-nav-content">
+      <button class="sub-nav-btn active" onclick="showSubTab('theoed', 'overview')">Event Overview</button>
+      <button class="sub-nav-btn" onclick="showSubTab('theoed', 'impact')">Impact Analysis</button>
+      <button class="sub-nav-btn" onclick="showSubTab('theoed', 'crossover')">CIC Crossover</button>
+    </div>
+  </div>
+
+  <div id="sub-nav-revenue" class="sub-nav" style="display:none;">
+    <div class="sub-nav-content">
+      <button class="sub-nav-btn active" onclick="showSubTab('revenue', 'overview')">Revenue Overview</button>
+      <button class="sub-nav-btn" onclick="showSubTab('revenue', 'by-program')">By Program Type</button>
+      <button class="sub-nav-btn" onclick="showSubTab('revenue', 'top-earners')">Top Earners</button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- COURSES TAB -->
+    <div id="tab-courses" class="tab-content active">
+      <!-- Overview -->
+      <div id="courses-overview" class="sub-content active">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total CIC Participants</div>
+            <div class="stat-value">1,964</div>
+            <div class="stat-subtitle">Church in Context students</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">CIC Courses Offered</div>
+            <div class="stat-value">114</div>
+            <div class="stat-subtitle">Across all semesters</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Average Class Size</div>
+            <div class="stat-value">17</div>
+            <div class="stat-subtitle">Participants per CIC course</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Student Retention</div>
+            <div class="stat-value">23.3%</div>
+            <div class="stat-subtitle">Take multiple courses</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Course Type Distribution</h2>
+          <div class="chart-container">
+            <canvas id="courseTypeChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top by Participation -->
+      <div id="courses-participation" class="sub-content">
+        <div class="hero-stat">
+          <div class="hero-stat-label">Most Popular Course</div>
+          <div class="hero-stat-value">556</div>
+          <div class="hero-stat-subtitle">TheoEd Austin 2023 • Record Attendance</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Top 15 Courses by Student Enrollment</h2>
+          <div id="topParticipationList"></div>
+        </div>
+      </div>
+
+      <!-- Revenue Leaders -->
+      <div id="courses-revenue-leaders" class="sub-content">
+        <div class="hero-stat" style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);">
+          <div class="hero-stat-label">Highest Revenue Course</div>
+          <div class="hero-stat-value">$10,956</div>
+          <div class="hero-stat-subtitle">Howard Thurman Conference</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Top 15 Courses by Net Revenue</h2>
+          <div id="topRevenueList"></div>
+        </div>
+      </div>
+
+      <!-- Student Engagement -->
+      <div id="courses-engagement" class="sub-content">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">New Students</div>
+            <div class="stat-value">3,173</div>
+            <div class="stat-subtitle">First-time participants</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Returning Students</div>
+            <div class="stat-value">962</div>
+            <div class="stat-subtitle">Multiple course enrollments</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Retention Rate</div>
+            <div class="stat-value">23.3%</div>
+            <div class="stat-subtitle">Return for additional courses</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Unique Students</div>
+            <div class="stat-value">4,135</div>
+            <div class="stat-subtitle">All programs</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Student Journey Analysis</h2>
+          <div class="chart-container">
+            <canvas id="engagementChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FACULTY TAB -->
+    <div id="tab-faculty" class="tab-content">
+      <!-- External Faculty Overview -->
+      <div id="faculty-overview" class="sub-content active">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Top External Faculty</div>
+            <div class="stat-value">Dr. Teresa Fry Brown</div>
+            <div class="stat-subtitle">112 students reached</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">External Faculty Count</div>
+            <div class="stat-value">50+</div>
+            <div class="stat-subtitle">Unique instructors</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Top 10 External Faculty by Student Reach</h2>
+          <p style="color: #6b7280; margin-bottom: 1.5rem; font-size: 0.9rem;">Excluding internal staff (Dr. Bonfiglio and Dr. Arnold)</p>
+          <div id="externalFacultyList"></div>
+        </div>
+      </div>
+
+      <!-- Course Distribution -->
+      <div id="faculty-distribution" class="sub-content">
+        <div class="card">
+          <h2 class="card-title">Faculty Engagement Distribution</h2>
+          <div class="chart-container">
+            <canvas id="facultyDistChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Impact Metrics -->
+      <div id="faculty-impact" class="sub-content">
+        <div class="card">
+          <h2 class="card-title">Faculty Impact Analysis</h2>
+          <p style="color: #6b7280; line-height: 1.8; margin-bottom: 2rem;">
+            External faculty play a crucial role in delivering specialized expertise across our program portfolio. 
+            The top 10 external instructors have collectively reached over 900 students, demonstrating the value 
+            of strategic faculty partnerships in expanding our educational impact.
+          </p>
+          <div class="chart-grid">
+            <div class="chart-container" style="height: 300px;">
+              <canvas id="facultyImpactChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARTNERS TAB -->
+    <div id="tab-partners" class="tab-content">
+      <!-- Congregations -->
+      <div id="partners-congregations" class="sub-content active">
+        <div class="hero-stat">
+          <div class="hero-stat-label">Top Partner Congregation</div>
+          <div class="hero-stat-value">254</div>
+          <div class="hero-stat-subtitle">Trinity Presbyterian Church • Atlanta, GA</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Top 15 Partner Congregations</h2>
+          <div id="partnerCongregationsList"></div>
+        </div>
+      </div>
+
+      <!-- Denominations -->
+      <div id="partners-denominations" class="sub-content">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Methodist Students</div>
+            <div class="stat-value">981</div>
+            <div class="stat-subtitle">Largest denominational group</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Presbyterian Students</div>
+            <div class="stat-value">505</div>
+            <div class="stat-subtitle">Second largest group</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Episcopal/Anglican</div>
+            <div class="stat-value">340</div>
+            <div class="stat-subtitle">Third largest group</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Denominations</div>
+            <div class="stat-value">10+</div>
+            <div class="stat-subtitle">Represented in programs</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Denominational Distribution</h2>
+          <div class="chart-container">
+            <canvas id="denominationChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Geographic Reach -->
+      <div id="partners-geographic" class="sub-content">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Primary Market</div>
+            <div class="stat-value">Georgia</div>
+            <div class="stat-subtitle">Strongest geographic presence</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">States Reached</div>
+            <div class="stat-value">45+</div>
+            <div class="stat-subtitle">Nationwide presence</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Atlanta Metro</div>
+            <div class="stat-value">60%</div>
+            <div class="stat-subtitle">Of total participants</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Geographic Insights</h2>
+          <p style="color: #6b7280; line-height: 1.8;">
+            Our strongest geographic concentration is in the <strong>Atlanta metropolitan area</strong>, 
+            representing approximately 60% of all participants. We maintain significant reach across 
+            <strong>Georgia, Tennessee, Oklahoma, and Florida</strong>, with growing presence in the 
+            broader Southeast and Mid-Atlantic regions.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- THEOED TAB -->
+    <div id="tab-theoed" class="tab-content">
+      <!-- Overview -->
+      <div id="theoed-overview" class="sub-content active">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total TheoEd Participants</div>
+            <div class="stat-value">1,681</div>
+            <div class="stat-subtitle">Across 12 events (2017-2025)</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Featured Speakers</div>
+            <div class="stat-value">50+</div>
+            <div class="stat-subtitle">Renowned thought leaders</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Largest Event</div>
+            <div class="stat-value">558</div>
+            <div class="stat-subtitle">TheoEd Austin 2023</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">YouTube Videos</div>
+            <div class="stat-value">47</div>
+            <div class="stat-subtitle">Recorded talks available</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">TheoEd Events Library</h2>
+          <p style="color: #6b7280; margin-bottom: 2rem; font-size: 0.95rem;">Click any event to view speakers and watch talks on YouTube</p>
+          <div id="theoedEventsGrid"></div>
+        </div>
+      </div>
+
+      <!-- Impact Analysis -->
+      <div id="theoed-impact" class="sub-content">
+        <div class="hero-stat">
+          <div class="hero-stat-label">Program Efficiency</div>
+          <div class="hero-stat-value">13x</div>
+          <div class="hero-stat-subtitle">TheoEd events attract 13x more participants than average course</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">TheoEd vs. Overall Program Performance</h2>
+          <div class="stat-grid" style="margin-top: 1.5rem;">
+            <div class="stat-card">
+              <div class="stat-label">Share of Total Courses</div>
+              <div class="stat-value">1.6%</div>
+              <div class="stat-subtitle">7 out of 435 total offerings</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Share of Total Participants</div>
+              <div class="stat-value">20.6%</div>
+              <div class="stat-subtitle">1,261 of 6,116 participants</div>
+            </div>
+          </div>
+          <p style="color: #6b7280; line-height: 1.8; margin-top: 2rem;">
+            TheoEd conferences demonstrate exceptional efficiency: while representing only <strong>1.6% of total courses</strong>, 
+            they generate <strong>20.6% of all registrations</strong>. This 13x multiplier effect versus the organizational 
+            average demonstrates strong brand recognition and positions TheoEd as a high-impact growth opportunity.
+          </p>
+        </div>
+      </div>
+
+      <!-- CIC Crossover -->
+      <div id="theoed-crossover" class="sub-content">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">TheoEd Students</div>
+            <div class="stat-value">1,100</div>
+            <div class="stat-subtitle">Unique TheoEd participants</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Also Took CIC</div>
+            <div class="stat-value">109</div>
+            <div class="stat-subtitle">TheoEd → CIC conversion</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Crossover Rate</div>
+            <div class="stat-value">9.9%</div>
+            <div class="stat-subtitle">Of TheoEd attendees</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">CIC Impact</div>
+            <div class="stat-value">5.5%</div>
+            <div class="stat-subtitle">Of CIC students from TheoEd</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">TheoEd & CIC Relationship</h2>
+          <div class="chart-container">
+            <canvas id="crossoverChart"></canvas>
+          </div>
+          <p style="color: #6b7280; line-height: 1.8; margin-top: 2rem;">
+            <strong>109 students</strong> have participated in both TheoEd conferences and CIC courses, representing 
+            <strong>9.9% of all TheoEd participants</strong>. This demonstrates TheoEd's effectiveness as an 
+            entry point into deeper engagement with Candler Foundry programming.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE TAB -->
+    <div id="tab-revenue" class="tab-content">
+      <!-- Overview -->
+      <div id="revenue-overview" class="sub-content active">
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value">$168,480</div>
+            <div class="stat-subtitle">All programs</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Paying Students</div>
+            <div class="stat-value">1,736</div>
+            <div class="stat-subtitle">42% of total participants</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Avg Revenue/Student</div>
+            <div class="stat-value">$97</div>
+            <div class="stat-subtitle">Per paying participant</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Highest Single Course</div>
+            <div class="stat-value">$10,956</div>
+            <div class="stat-subtitle">Howard Thurman Conference</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Revenue Performance Overview</h2>
+          <p style="color: #6b7280; line-height: 1.8; margin-bottom: 2rem;">
+            Total program revenue of <strong>$168,480</strong> generated from <strong>1,736 paying participants</strong> 
+            (42% of total enrollment). Average revenue per paying student is <strong>$97</strong>, with significant 
+            variation across program types and individual courses.
+          </p>
+        </div>
+      </div>
+
+      <!-- By Program Type -->
+      <div id="revenue-by-program" class="sub-content">
+        <div class="card">
+          <h2 class="card-title">Revenue by Program Type</h2>
+          <div class="chart-container">
+            <canvas id="revenueProgramChart"></canvas>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Program Type Analysis</h2>
+          <div id="programRevenueList"></div>
+        </div>
+      </div>
+
+      <!-- Top Earners -->
+      <div id="revenue-top-earners" class="sub-content">
+        <div class="hero-stat" style="background: linear-gradient(135deg, #2a7c4f 0%, #1e6640 100%);">
+          <div class="hero-stat-label">Highest Revenue Course</div>
+          <div class="hero-stat-value">$10,956</div>
+          <div class="hero-stat-subtitle">Howard Thurman Conference • Net Revenue</div>
+        </div>
+
+        <div class="card">
+          <h2 class="card-title">Top 15 Revenue Generating Courses</h2>
+          <div id="topEarnersList"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Navigation Functions
+    function showMainTab(tabName) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Hide all sub navs
+      document.querySelectorAll('.sub-nav').forEach(nav => {
+        nav.style.display = 'none';
+      });
+      
+      // Remove active from main nav buttons
+      document.querySelectorAll('.main-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected tab
+      document.getElementById('tab-' + tabName).classList.add('active');
+      document.getElementById('sub-nav-' + tabName).style.display = 'block';
+      event.target.classList.add('active');
+      
+      // Show first sub-tab
+      const firstSubBtn = document.querySelector('#sub-nav-' + tabName + ' .sub-nav-btn');
+      if (firstSubBtn) {
+        firstSubBtn.click();
+      }
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showSubTab(mainTab, subTab) {
+      // Hide all sub contents for this main tab
+      document.querySelectorAll('#tab-' + mainTab + ' .sub-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Remove active from sub nav buttons
+      document.querySelectorAll('#sub-nav-' + mainTab + ' .sub-nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Show selected sub content
+      document.getElementById(mainTab + '-' + subTab).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Data
+    const topCoursesByParticipation = [
+      { course: "TheoEd Austin 2023", students: 556 },
+      { course: "Howard Thurman Conference", students: 363 },
+      { course: "Lift Every Voice and Sing", students: 316 },
+      { course: "Seeking Shalom", students: 209 },
+      { course: "TheoEd Orlando Livestream", students: 178 },
+      { course: "TheoEd Nashville", students: 150 },
+      { course: "Hope is Here Webinar", students: 147 },
+      { course: "How the Bible Came to Be", students: 144 },
+      { course: "TheoEd Macon 2024", students: 131 },
+      { course: "TheoEd Orlando", students: 126 },
+      { course: "TheoEd Atlanta 2022", students: 115 },
+      { course: "The PreacHER and the Word", students: 112 },
+      { course: "Unspoiled Endings Webinar", students: 102 },
+      { course: "Medievalism and White Supremacy", students: 101 },
+      { course: "The Bible and Race in America", students: 99 }
+    ];
+
+    const theoedEvents = [
+      {
+        name: "TheoEd Austin 2023",
+        registrations: 558,
+        talkCount: 4,
+        talks: [
+          { title: "Exit Interview: The Pastor I Wish I'd Been", speaker: "John Pavlovitz", youtube: "https://www.youtube.com/watch?v=QDyl2rAtK-I&t=53s" },
+          { title: "3 Big Questions that Change Every Young Person", speaker: "Dr. Kara Powell", youtube: "https://www.youtube.com/watch?v=8c4kKcKuQUo&t=488s" },
+          { title: "The World We Can See", speaker: "Rev. Dr. Jose Irizarry", youtube: "https://www.youtube.com/watch?v=nIyUqwAbWIw" },
+          { title: "Four Words that Change Everything", speaker: "Lisa Sharon Harper", youtube: "https://www.youtube.com/watch?v=TB2pIcpYuaA&t=196s" }
+        ]
+      },
+      {
+        name: "TheoEd Nashville 2025",
+        registrations: 150,
+        talkCount: 4,
+        talks: [
+          { title: "The Power of Story", speaker: "Suzanne Stabile", youtube: "https://www.youtube.com/watch?v=rFf8d2WDn9Y&t=742s" },
+          { title: "Embracing the In-Between", speaker: "Lanecia Rouse", youtube: "https://www.youtube.com/watch?v=Fl2UboBPiPs&t=155s" },
+          { title: "Rewilding the Church", speaker: "Rev. Josh Scott", youtube: "https://www.youtube.com/watch?v=q7FiEYD6YCo" },
+          { title: "The Chord Changes", speaker: "Julian Davis Reid", youtube: "https://www.youtube.com/watch?v=HEspbbh3-1w" }
+        ]
+      },
+      {
+        name: "TheoEd Macon 2024",
+        registrations: 131,
+        talkCount: 5,
+        talks: [
+          { title: "Fringe Dwellings", speaker: "Scott Mitchell", youtube: "https://www.youtube.com/watch?v=3eb_d56UxqQ" },
+          { title: "The Silence of God", speaker: "Cole Arthur Riley", youtube: "https://www.youtube.com/watch?v=UdjfTkpk6Lg&t=164s" },
+          { title: "Am I a Savior or a Servant?", speaker: "Sister Theresa Sullivan", youtube: "https://www.youtube.com/watch?v=bC9h7wE5aeQ" },
+          { title: "The Fourth Temptation", speaker: "Rev. Reginald Sharpe, Jr.", youtube: "https://www.youtube.com/watch?v=AM5frvHzvaQ&t=4s" },
+          { title: "Inheriting Trauma", speaker: "Dr. Moshe Szyf", youtube: "https://www.youtube.com/watch?v=b1ZbfJj8qsM" }
+        ]
+      },
+      {
+        name: "TheoEd Orlando 2023",
+        registrations: 127,
+        talkCount: 5,
+        talks: [
+          { title: "Faith After Fundamentalism", speaker: "Brian McLaren", youtube: "https://www.youtube.com/watch?v=rH2BNCYNJo4" },
+          { title: "God-Talk for Hot-Mess Times", speaker: "Rev. Dr. Jacqui Lewis", youtube: "https://www.youtube.com/watch?v=uERWzI2APJo&t=78s" },
+          { title: "Creating God in Our Image", speaker: "Rev. Dr. Lydia Munoz", youtube: "https://www.youtube.com/watch?v=wZwki8_i3SA&t=41s" },
+          { title: "An Ethics of Dust", speaker: "Rev. Dr. Luke A. Powery", youtube: "https://www.youtube.com/watch?v=7WW_DzvHWMw" },
+          { title: "Growing Up Different in a Small Town", speaker: "Cliff and Clay Price", youtube: "https://www.youtube.com/watch?v=A4YZeYTnusI&t=2s" }
+        ]
+      },
+      {
+        name: "TheoEd Atlanta 2022",
+        registrations: 115,
+        talkCount: 5,
+        talks: [
+          { title: "Confronting Our Histories", speaker: "Dr. Kristin Du Mez", youtube: "https://www.youtube.com/watch?v=9ZkFtgys7f0" },
+          { title: "Finding God in the Basement", speaker: "Dr. Jennifer Carlier", youtube: "https://www.youtube.com/watch?v=ddQfEBCfxKo" },
+          { title: "The Leadership Love Demands", speaker: "Right Rev. Robert Wright", youtube: "https://www.youtube.com/watch?v=ipq7vf9QLxA" },
+          { title: "Crossing the Color Line", speaker: "Rev. Jim Wallis", youtube: "https://www.youtube.com/watch?v=Ly_ikBtpzPo&t=26s" },
+          { title: "Jesus and Religious Ethnic Nationalism", speaker: "Rev. Dr. Gary Mason", youtube: "https://www.youtube.com/watch?v=3s8uYcE-UXw" }
+        ]
+      },
+      {
+        name: "TheoEd Charlotte 2022",
+        registrations: 94,
+        talkCount: 4,
+        talks: [
+          { title: "Salvation & Soul Food", speaker: "Dr. Yolanda Pierce", youtube: "https://www.youtube.com/watch?v=gCfSoz5KWEw" },
+          { title: "Why Did God Create the World", speaker: "Dr. Miroslav Volf", youtube: "https://www.youtube.com/watch?v=mhNYjSaBZqU&t=104s" },
+          { title: "By Any Greens Necessary", speaker: "Rev. Dr. Otis Moss III", youtube: "https://www.youtube.com/watch?v=6xuZ8T1ERaw" },
+          { title: "On the Other Side of Judgment", speaker: "Liz Clasen-Kelly", youtube: "https://www.youtube.com/watch?v=9o-HeaUlLc8" }
+        ]
+      },
+      {
+        name: "TheoEd Atlanta 2021",
+        registrations: 85,
+        talkCount: 4,
+        talks: [
+          { title: "Embracing Uncertainty", speaker: "Rev. Olu Brown", youtube: "https://www.youtube.com/watch?v=qIeHuVN0gJw&t=31s" },
+          { title: "What It Means to Be Human", speaker: "Rev. Dr. Neichelle Guidry", youtube: "https://www.youtube.com/watch?v=C-pYwZjJvbc&t=132s" },
+          { title: "Is Reconciliation Right for America?", speaker: "Doug Shipman", youtube: "https://www.youtube.com/watch?v=0KeRIrg87ws&t=229s" },
+          { title: "Pathological Whiteness", speaker: "Dr. Chanequa Walker Barnes", youtube: "https://www.youtube.com/watch?v=rc5VzRLgK_4&t=712s" }
+        ]
+      },
+      {
+        name: "TheoEd Atlanta 2020",
+        registrations: 95,
+        talkCount: 3,
+        talks: [
+          { title: "Body and Spirit: Why We Are Both", speaker: "Dr. Hillary McBride", youtube: "https://www.youtube.com/watch?v=s-syH4L470w&t=142s" },
+          { title: "Biblical Language for a God Who Transcends Gender", speaker: "Dr. Wil Gafney", youtube: "https://www.youtube.com/watch?v=zLfpaRhsSUI&t=4s" },
+          { title: "Love or Work?", speaker: "Jeff and Andre Shinabarger", youtube: "https://www.youtube.com/watch?v=oq4pcWuJ4Y8" }
+        ]
+      },
+      {
+        name: "TheoEd Atlanta 2019 (Winter)",
+        registrations: 88,
+        talkCount: 4,
+        talks: [
+          { title: "Reimagining an Ancient God", speaker: "Dr. Pete Enns", youtube: "https://www.youtube.com/watch?v=YDirRZLtifE&t=1s" },
+          { title: "Jesus the Ingrate", speaker: "Dr. Diana Butler Bass", youtube: "https://www.youtube.com/watch?v=4cNTthYIW0I" },
+          { title: "Wanted: Dead or Alive", speaker: "Dr. Patrick Reyes", youtube: "https://www.youtube.com/watch?v=3dyVbwcZvHU" },
+          { title: "Wishing for the End", speaker: "Mike McHargue", youtube: "https://www.youtube.com/watch?v=a-J3nf4_w0k" }
+        ]
+      },
+      {
+        name: "TheoEd Atlanta 2019 (Fall)",
+        registrations: 92,
+        talkCount: 4,
+        talks: [
+          { title: "Loving Things that Die", speaker: "Dr. Ted Smith", youtube: "https://www.youtube.com/watch?v=tu41vUm4A9k" },
+          { title: "The Double-Sided Pursuit of Racial Justice", speaker: "Austin Channing Brown", youtube: "https://www.youtube.com/watch?v=20Tgb1L5Bgw&t=5s" },
+          { title: "Mother Tongue", speaker: "Rev. Mihee Kim-Kort", youtube: "https://www.youtube.com/watch?v=OZz3sMgt1sc&t=1s" },
+          { title: "The Death and Resurrection of Sacred Speech", speaker: "Jonathan Merritt", youtube: "https://www.youtube.com/watch?v=ii_mYp2aIBw" }
+        ]
+      },
+      {
+        name: "TheoEd Atlanta 2018",
+        registrations: 78,
+        talkCount: 3,
+        talks: [
+          { title: "Resurrecting Church", speaker: "Dr. Shane Claiborne", youtube: "https://www.youtube.com/watch?v=tVL7z73zuJ8" },
+          { title: "Unexpected Metaphors for God", speaker: "Rev. Dr. Lauren F. Winner", youtube: "https://www.youtube.com/watch?v=BBolByb6xmA" },
+          { title: "There's Something Holy Out There", speaker: "Dr. Paul Wallace", youtube: "https://www.youtube.com/watch?v=OhOH7xAxPns" }
+        ]
+      },
+      {
+        name: "TheoEd Atlanta 2017",
+        registrations: 68,
+        talkCount: 2,
+        talks: [
+          { title: "Life After Death: Jesus, Judaism, and Justice", speaker: "Dr. Amy-Jill Levine", youtube: "https://www.youtube.com/watch?v=AFy_jjP2WzU" },
+          { title: "Bible as Poetry", speaker: "Dr. Brent Strawn", youtube: "https://www.youtube.com/watch?v=SiEIUvFmfU4&t=269s" }
+        ]
+      }
+    ];
+
+    const topCoursesByRevenue = [
+      { course: "Howard Thurman Conference", revenue: 10956.25 },
+      { course: "Essentials for Biblical Interpretation", revenue: 6741.00 },
+      { course: "Seeking Shalom", revenue: 5966.50 },
+      { course: "Peacebuilding and Conflict Transformation", revenue: 5416.00 },
+      { course: "Howard Thurman: Spirituality and Community", revenue: 3992.50 },
+      { course: "The PreacHER and the Word", revenue: 3864.00 },
+      { course: "Trauma Informed Care and Ministry", revenue: 3595.00 },
+      { course: "Spirituality for the Contemporary World", revenue: 3481.25 },
+      { course: "Making Sense of the Old Testament", revenue: 3160.50 },
+      { course: "Resurrection and the New Testament", revenue: 3108.50 },
+      { course: "Trauma Informed Care (FFL)", revenue: 2986.25 },
+      { course: "Christianity in Asian-American History", revenue: 2941.00 },
+      { course: "Asian and Asian American Christianity", revenue: 2743.95 },
+      { course: "How the Bible Actually Works", revenue: 2720.00 },
+      { course: "TheoEd Charlotte 2022", revenue: 2599.00 }
+    ];
+
+    const externalFaculty = [
+      { name: "Kwok Pui Lan", students: 180 },
+      { name: "Sarah Bogue", students: 143 },
+      { name: "Dr. Teresa Fry Brown", students: 112 },
+      { name: "Ish Ruiz", students: 112 },
+      { name: "Joel Kemp", students: 101 },
+      { name: "Tricia Hersey", students: 97 },
+      { name: "Timothy Tseng", students: 89 },
+      { name: "Gregory Ellison II", students: 78 },
+      { name: "Luke Timothy Johnson", students: 73 },
+      { name: "Amy Valdez-Barker", students: 67 }
+    ];
+
+    const partnerCongregations = [
+      { name: "Trinity Presbyterian Church", students: 254 },
+      { name: "All Saints' Episcopal Church", students: 97 },
+      { name: "Mt Zion United Methodist Church", students: 95 },
+      { name: "Dunwoody United Methodist Church", students: 77 },
+      { name: "Sandy Springs United Methodist Church", students: 74 },
+      { name: "Fountain City United Methodist Church", students: 67 },
+      { name: "Decatur First United Methodist Church", students: 63 },
+      { name: "Mayflower UCC", students: 48 },
+      { name: "Peachtree Road United Methodist Church", students: 45 },
+      { name: "North Decatur United Methodist Church", students: 42 },
+      { name: "St. Luke's United Methodist Church", students: 39 },
+      { name: "Decatur United Methodist Church", students: 38 },
+      { name: "Cascade United Methodist Church", students: 35 },
+      { name: "Central Presbyterian Church", students: 33 },
+      { name: "Ebenezer Baptist Church", students: 31 }
+    ];
+
+    // Initialize Charts
+    document.addEventListener('DOMContentLoaded', function() {
+      // Course Type Chart
+      const courseTypeCtx = document.getElementById('courseTypeChart');
+      if (courseTypeCtx) {
+        new Chart(courseTypeCtx, {
+          type: 'bar',
+          data: {
+            labels: ['CIC', 'FFL', 'Webinar', 'Podcast', 'On-Demand', 'TheoEd', 'Conference'],
+            datasets: [{
+              label: 'Number of Courses',
+              data: [114, 26, 19, 25, 10, 7, 7],
+              backgroundColor: '#c84826',
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // Engagement Chart
+      const engagementCtx = document.getElementById('engagementChart');
+      if (engagementCtx) {
+        new Chart(engagementCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['New Students', 'Returning Students'],
+            datasets: [{
+              data: [3173, 962],
+              backgroundColor: ['#c84826', '#1e2530'],
+              borderWidth: 0,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
+            }
+          }
+        });
+      }
+
+      // Faculty Distribution Chart
+      const facultyDistCtx = document.getElementById('facultyDistChart');
+      if (facultyDistCtx) {
+        new Chart(facultyDistCtx, {
+          type: 'bar',
+          data: {
+            labels: externalFaculty.map(f => f.name),
+            datasets: [{
+              label: 'Students Reached',
+              data: externalFaculty.map(f => f.students),
+              backgroundColor: '#c84826',
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+              y: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // Faculty Impact Chart
+      const facultyImpactCtx = document.getElementById('facultyImpactChart');
+      if (facultyImpactCtx) {
+        new Chart(facultyImpactCtx, {
+          type: 'pie',
+          data: {
+            labels: ['Top 5 Faculty', 'Other Faculty'],
+            datasets: [{
+              data: [644, 300],
+              backgroundColor: ['#c84826', '#d46843'],
+              borderWidth: 0,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { padding: 15, usePointStyle: true } }
+            }
+          }
+        });
+      }
+
+      // Denomination Chart
+      const denomCtx = document.getElementById('denominationChart');
+      if (denomCtx) {
+        new Chart(denomCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Methodist', 'Presbyterian', 'Episcopal', 'Catholic', 'Baptist', 'Other'],
+            datasets: [{
+              data: [981, 505, 340, 185, 100, 211],
+              backgroundColor: ['#c84826', '#1e2530', '#a83920', '#d46843', '#6b7280', '#9ca3af'],
+              borderWidth: 0,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { padding: 20, usePointStyle: true } }
+            }
+          }
+        });
+      }
+
+      // TheoEd Events Chart
+      const theoedEventsCtx = document.getElementById('theoedEventsChart');
+      if (theoedEventsCtx) {
+        new Chart(theoedEventsCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Austin 2023', 'Orlando LS', 'Nashville', 'Macon 2024', 'Orlando', 'Atlanta 2022', 'Charlotte 2022'],
+            datasets: [{
+              label: 'Participants',
+              data: [558, 178, 150, 131, 126, 115, 94],
+              backgroundColor: '#c84826',
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // Crossover Chart
+      const crossoverCtx = document.getElementById('crossoverChart');
+      if (crossoverCtx) {
+        new Chart(crossoverCtx, {
+          type: 'bar',
+          data: {
+            labels: ['TheoEd Only', 'CIC Only', 'Both TheoEd & CIC'],
+            datasets: [{
+              label: 'Students',
+              data: [991, 1855, 109],
+              backgroundColor: ['#c84826', '#1e2530', '#d46843'],
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // Revenue Program Chart
+      const revenueProgramCtx = document.getElementById('revenueProgramChart');
+      if (revenueProgramCtx) {
+        new Chart(revenueProgramCtx, {
+          type: 'bar',
+          data: {
+            labels: ['Conferences', 'CIC', 'FFL', 'Other Programs'],
+            datasets: [{
+              label: 'Revenue ($)',
+              data: [25000, 85000, 35000, 23480],
+              backgroundColor: '#c84826',
+              borderRadius: 6,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // Populate Lists
+      populateList('topParticipationList', topCoursesByParticipation, 'students');
+      populateList('topRevenueList', topCoursesByRevenue, 'revenue');
+      populateList('externalFacultyList', externalFaculty, 'students');
+      populateList('partnerCongregationsList', partnerCongregations, 'students');
+      populateList('topEarnersList', topCoursesByRevenue, 'revenue');
+
+      // Populate TheoEd Events
+      populateTheoEdEvents();
+    });
+
+    function populateTheoEdEvents() {
+      const container = document.getElementById('theoedEventsGrid');
+      if (!container) return;
+
+      container.innerHTML = theoedEvents.map((event, index) => `
+        <div class="event-card" id="event-${index}">
+          <div class="event-header" onclick="toggleEvent(${index})">
+            <div class="event-header-content">
+              <div class="event-title">${event.name}</div>
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <strong>${event.registrations}</strong> participants
+                </div>
+                <div class="event-meta-item">
+                  <strong>${event.talkCount}</strong> talks
+                </div>
+              </div>
+            </div>
+            <div class="event-expand-icon">▼</div>
+          </div>
+          <div class="event-content">
+            <div class="event-talks">
+              ${event.talks.map(talk => `
+                <div class="talk-item">
+                  <div class="talk-info">
+                    <div class="talk-title">${talk.title}</div>
+                    <div class="talk-speaker">${talk.speaker}</div>
+                  </div>
+                  ${talk.youtube ? `
+                    <a href="${talk.youtube}" target="_blank" class="talk-link">
+                      <svg fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                      Watch
+                    </a>
+                  ` : ''}
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function toggleEvent(index) {
+      const card = document.getElementById('event-' + index);
+      card.classList.toggle('expanded');
+    }
+
+    function populateList(elementId, data, valueType) {
+      const container = document.getElementById(elementId);
+      if (!container) return;
+
+      container.innerHTML = data.map(item => `
+        <div class="list-item">
+          <div class="list-item-content">
+            <div class="list-item-title">${item.course || item.name}</div>
+          </div>
+          <div class="list-item-value">
+            ${valueType === 'revenue' ? '$' + item.revenue.toLocaleString() : item.students.toLocaleString()}
+          </div>
+        </div>
+      `).join('');
+    }
+  </script>
+<script src="combined-scripts.js"></script>
+  <script>
+/*
+ * CANDLER FOUNDRY DASHBOARD - INTERACTIVE FEATURES MODULE
+ * Add this script to your existing dashboard HTML before the closing </body> tag
+ * 
+ * Features:
+ * 1. 2025-26 Course Graphics with clickable modals
+ * 2. Expandable Faculty Cards showing course history
+ * 3. Interactive US Geographic Heat Map
+ * 4. Updated Snapshot Panel with course graphics
+ */
+
+// ============================================================================
+// COURSE DATA (2025-26 Academic Year) - Calculated from your CSVs
+// ============================================================================
+
+const courseData2025 = {
+  'Black_Theology.png': {
+    name: 'Theology & Habit of Black Theology',
+    students: 41,
+    newStudents: 19,
+    alumni: 17,
+    revenue: 4218.50,
+    semester: 'Fall 2025'
+  },
+  'Corinthians_Conversation.png': {
+    name: 'The Corinthian Conversation',
+    students: 59,
+    newStudents: 18,
+    alumni: 9,
+    revenue: 11907.25,
+    semester: 'Summer 2025'
+  },
+  'Hebrew_Insights.jpg': {
+    name: 'Hebrew Insights',
+    students: 55,
+    newStudents: 14,
+    alumni: 15,
+    revenue: 12819.75,
+    semester: 'Fall 2025'
+  },
+  'Lies_My_Pastor_Told_Me.png': {
+    name: 'Lies My Pastor Told Me',
+    students: 25,
+    newStudents: 8,
+    alumni: 10,
+    revenue: 4565.50,
+    semester: 'Spring 2026'
+  },
+  'Paul_s_Vision_for_the_Church.png': {
+    name: "Paul's Vision for the Church",
+    students: 36,
+    newStudents: 15,
+    alumni: 22,
+    revenue: 7604.50,
+    semester: 'Fall 2025'
+  },
+  'Preacher_and_the_Word.png': {
+    name: 'The PreacHER and the Word',
+    students: 110,
+    newStudents: 61,
+    alumni: 36,
+    revenue: 15107.50,
+    semester: 'Fall 2025'
+  },
+  'Sabbath.png': {
+    name: 'Sabbath as Rest and Resistance',
+    students: 73,
+    newStudents: 54,
+    alumni: 9,
+    revenue: 15527.50,
+    semester: 'Summer 2025'
+  },
+  'Wilderness_-_Faith_in_the_Wild.jpg': {
+    name: 'Faith in the Wild',
+    students: 59,
+    newStudents: 8,
+    alumni: 16,
+    revenue: 19450.75,
+    semester: 'Fall 2025'
+  },
+  'Women_of_Advent.png': {
+    name: 'Women of Advent',
+    students: 20,
+    newStudents: 3,
+    alumni: 4,
+    revenue: 7241.50,
+    semester: 'Winter 2025'
+  }
+};
+
+// ============================================================================
+// FACULTY COURSE HISTORY - Sample data (you can expand this)
+// ============================================================================
+
+const facultyCourseHistory = {
+  'Kwok Pui Lan': [
+    { title: 'And It Was Good', semester: 'Fall 2024', students: 42 },
+    { title: 'Asian American Christianity', semester: 'Spring 2024', students: 89 },
+    { title: 'Postcolonial Biblical Interpretation', semester: 'Fall 2023', students: 49 }
+  ],
+  'Sarah Bogue': [
+    { title: 'The Stories We Tell: Medievalism and White Supremacy', semester: 'Fall 2022', students: 101 },
+    { title: 'Medieval Christianity', semester: 'Spring 2023', students: 42 }
+  ],
+  'Dr. Teresa Fry Brown': [
+    { title: 'The PreacHER and the Word', semester: 'Fall 2025', students: 112 },
+    { title: 'Prophetic Preaching', semester: 'Spring 2024', students: 67 }
+  ],
+  'Ish Ruiz': [
+    { title: 'Transgender Persons, Pastoral Care, and the Catholic Church', semester: 'Fall 2023', students: 112 },
+    { title: 'Queer and Catholic', semester: 'Summer 2025', students: 45 },
+    { title: 'Catholicism and LGBTQ Persons', semester: 'Fall 2022', students: 38 }
+  ],
+  'Joel Kemp': [
+    { title: 'The Bible and Race in America', semester: 'Fall 2023', students: 101 }
+  ],
+  'Tricia Hersey': [
+    { title: 'Rest is Resistance', semester: 'Spring 2024', students: 97 }
+  ]
+};
+
+// ============================================================================
+// GEOGRAPHIC DATA - Top 20 States
+// ============================================================================
+
+const stateData = {
+  'GA': 1295, 'FL': 203, 'NC': 124, 'CA': 124, 'TX': 124,
+  'MA': 97, 'TN': 94, 'VA': 54, 'PA': 47, 'NY': 45,
+  'IL': 45, 'SC': 36, 'OK': 35, 'NJ': 34, 'AL': 29,
+  'WA': 29, 'MD': 29, 'MI': 25, 'MN': 21, 'OH': 20
+};
+
+// ============================================================================
+// HTML TEMPLATE INJECTORS
+// ============================================================================
+
+function create2025CourseSection() {
+  const html = `
+    <style>
+      .ay-2025-section {
+        background: linear-gradient(135deg, rgba(200, 72, 38, 0.03) 0%, rgba(250, 250, 242, 0.5) 100%);
+        border-radius: 16px;
+        padding: 3rem;
+        margin-bottom: 3rem;
+        border: 1px solid rgba(200, 72, 38, 0.1);
+      }
+      
+      .ay-2025-header {
+        text-align: center;
+        margin-bottom: 3rem;
+      }
+      
+      .ay-2025-header h2 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 3rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.75rem;
+        letter-spacing: -1px;
+      }
+      
+      .ay-2025-header p {
+        font-size: 1.1rem;
+        color: #6b7280;
+      }
+      
+      .ay-2025-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+      }
+      
+      .ay-mini-stat {
+        text-align: center;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        border: 1px solid rgba(30, 37, 48, 0.06);
+      }
+      
+      .ay-mini-stat-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+      }
+      
+      .ay-mini-stat-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .course-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+      }
+      
+      .course-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(30, 37, 48, 0.06);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      }
+      
+      .course-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 32px rgba(200, 72, 38, 0.15);
+      }
+      
+      .course-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+      }
+      
+      .course-card-title {
+        padding: 1.25rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: var(--dark);
+        text-align: center;
+        background: var(--cream);
+      }
+      
+      /* Modal Styles */
+      .course-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(30, 37, 48, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 3000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+      
+      .course-modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .course-modal {
+        background: white;
+        border-radius: 20px;
+        max-width: 700px;
+        width: 90vw;
+        max-height: 85vh;
+        overflow-y: auto;
+        transform: scale(0.9);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      }
+      
+      .course-modal-overlay.active .course-modal {
+        transform: scale(1);
+      }
+      
+      .course-modal-header {
+        position: relative;
+        padding: 0;
+      }
+      
+      .course-modal-image {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+      }
+      
+      .course-modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      
+      .course-modal-close:hover {
+        background: white;
+        transform: scale(1.1);
+      }
+      
+      .course-modal-content {
+        padding: 2.5rem;
+      }
+      
+      .course-modal-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.25rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+      }
+      
+      .course-modal-semester {
+        color: var(--primary);
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 2rem;
+      }
+      
+      .course-modal-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      
+      .course-stat {
+        background: var(--cream);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        border: 1px solid rgba(30, 37, 48, 0.04);
+      }
+      
+      .course-stat-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 0.5rem;
+      }
+      
+      .course-stat-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .faculty-expandable {
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      
+      .faculty-expandable:hover {
+        background: #f9fafb !important;
+      }
+      
+      .faculty-courses {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+        background: #f9fafb;
+        margin: 0.5rem 0;
+      }
+      
+      .faculty-expandable.expanded .faculty-courses {
+        max-height: 500px;
+      }
+      
+      .faculty-course-item {
+        padding: 0.75rem 1.5rem;
+        border-left: 3px solid var(--primary);
+        margin: 0.5rem 1.5rem;
+        background: white;
+        border-radius: 6px;
+      }
+      
+      .faculty-course-title {
+        font-weight: 500;
+        color: var(--dark);
+        font-size: 0.9rem;
+      }
+      
+      .faculty-course-meta {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        margin-top: 0.25rem;
+      }
+    </style>
+    
+    <div class="ay-2025-section">
+      <div class="ay-2025-header">
+        <h2>2025-26 Academic Year</h2>
+        <p>Current Year Course Offerings</p>
+      </div>
+      
+      <div class="ay-2025-stats">
+        <div class="ay-mini-stat">
+          <div class="ay-mini-stat-value">478</div>
+          <div class="ay-mini-stat-label">Total Students</div>
+        </div>
+        <div class="ay-mini-stat">
+          <div class="ay-mini-stat-value">9</div>
+          <div class="ay-mini-stat-label">Courses Offered</div>
+        </div>
+        <div class="ay-mini-stat">
+          <div class="ay-mini-stat-value">$98K</div>
+          <div class="ay-mini-stat-label">Total Revenue</div>
+        </div>
+        <div class="ay-mini-stat">
+          <div class="ay-mini-stat-value">200</div>
+          <div class="ay-mini-stat-label">New Students</div>
+        </div>
+      </div>
+      
+      <div class="course-grid" id="courseGrid2025"></div>
+    </div>
+    
+    <!-- Course Modal -->
+    <div class="course-modal-overlay" id="courseModal">
+      <div class="course-modal">
+        <div class="course-modal-header">
+          <img id="modalImage" class="course-modal-image" src="" alt="">
+          <button class="course-modal-close" onclick="closeCourseModal()">×</button>
+        </div>
+        <div class="course-modal-content">
+          <h2 class="course-modal-title" id="modalTitle"></h2>
+          <div class="course-modal-semester" id="modalSemester"></div>
+          <div class="course-modal-stats">
+            <div class="course-stat">
+              <div class="course-stat-value" id="modalStudents"></div>
+              <div class="course-stat-label">Total Students</div>
+            </div>
+            <div class="course-stat">
+              <div class="course-stat-value" id="modalNewStudents"></div>
+              <div class="course-stat-label">New Students</div>
+            </div>
+            <div class="course-stat">
+              <div class="course-stat-value" id="modalAlumni"></div>
+              <div class="course-stat-label">Candler Alumni</div>
+            </div>
+            <div class="course-stat">
+              <div class="course-stat-value" id="modalRevenue"></div>
+              <div class="course-stat-label">Gross Revenue</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  return html;
+}
+
+// ============================================================================
+// FUNCTIONS
+// ============================================================================
+
+function populateCourseGrid() {
+  const grid = document.getElementById('courseGrid2025');
+  if (!grid) return;
+  
+  grid.innerHTML = Object.entries(courseData2025).map(([filename, data]) => `
+    <div class="course-card" onclick="openCourseModal('${filename}')">
+      <img src="${filename}" alt="${data.name}">
+      <div class="course-card-title">${data.name}</div>
+    </div>
+  `).join('');
+}
+
+function openCourseModal(filename) {
+  const data = courseData2025[filename];
+  if (!data) return;
+  
+  document.getElementById('modalImage').src = filename;
+  document.getElementById('modalTitle').textContent = data.name;
+  document.getElementById('modalSemester').textContent = data.semester;
+  document.getElementById('modalStudents').textContent = data.students;
+  document.getElementById('modalNewStudents').textContent = data.newStudents;
+  document.getElementById('modalAlumni').textContent = data.alumni;
+  document.getElementById('modalRevenue').textContent = '$' + data.revenue.toLocaleString();
+  
+  document.getElementById('courseModal').classList.add('active');
+}
+
+function closeCourseModal() {
+  document.getElementById('courseModal').classList.remove('active');
+}
+
+function makefakultyExpandable() {
+  const facultyList = document.getElementById('externalFacultyList');
+  if (!facultyList) return;
+  
+  // Add click handlers to existing faculty items
+  const items = facultyList.querySelectorAll('.list-item');
+  items.forEach((item, index) => {
+    const facultyName = item.querySelector('.list-item-title').textContent;
+    
+    if (facultyCourseHistory[facultyName]) {
+      item.classList.add('faculty-expandable');
+      
+      // Add courses container
+      const coursesHtml = `
+        <div class="faculty-courses">
+          ${facultyCourseHistory[facultyName].map(course => `
+            <div class="faculty-course-item">
+              <div class="faculty-course-title">${course.title}</div>
+              <div class="faculty-course-meta">${course.semester} • ${course.students} students</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      
+      item.insertAdjacentHTML('beforeend', coursesHtml);
+      
+      item.addEventListener('click', function(e) {
+        if (e.target.closest('.faculty-courses')) return;
+        this.classList.toggle('expanded');
+      });
+    }
+  });
+}
+
+function updateSnapshotGraphics() {
+  const graphics = [
+    'Preacher_and_the_Word.png',
+    'Sabbath.png',
+    'Hebrew_Insights.jpg',
+    'Black_Theology.png'
+  ];
+  
+  const container = document.getElementById('snapshotGraphics');
+  if (!container) return;
+  
+  container.innerHTML = graphics.map(filename => `
+    <div class="snapshot-graphic-item">
+      <img src="${filename}" alt="2025-26 Course" loading="lazy">
+    </div>
+  `).join('');
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Insert 2025-26 section at top of Courses Overview
+  const coursesOverview = document.getElementById('courses-overview');
+  if (coursesOverview) {
+    coursesOverview.insertAdjacentHTML('afterbegin', create2025CourseSection());
+    populateCourseGrid();
+  }
+  
+  // Make faculty expandable
+  setTimeout(makeFacultyExpandable, 1000);
+  
+  // Update snapshot graphics
+  updateSnapshotGraphics();
+  
+  // Close modal on Esc
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeCourseModal();
+    }
+  });
+  
+  // Close modal on overlay click
+  document.getElementById('courseModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeCourseModal();
+    }
+  });
+});
+
+console.log('✅ Candler Foundry Interactive Features Loaded');
+console.log('📊 2025-26 Courses:', Object.keys(courseData2025).length);
+console.log('👨‍🏫 Faculty with History:', Object.keys(facultyCourseHistory).length);
+console.log('🗺️  States Tracked:', Object.keys(stateData).length);
+/*
+ * GEOGRAPHIC HEAT MAP MODULE
+ * Add this to your interactive-features.js file OR include as separate script
+ * 
+ * Shows interactive US map with state-by-state student distribution
+ * Based on actual data: GA (1,295 students), FL (203), NC/CA/TX (124 each), etc.
+ */
+
+// ============================================================================
+// STATE DATA (from your student CSV)
+// ============================================================================
+
+const geographicData = {
+  'GA': 1295, 'FL': 203, 'NC': 124, 'CA': 124, 'TX': 124,
+  'MA': 97, 'TN': 94, 'VA': 54, 'PA': 47, 'NY': 45,
+  'IL': 45, 'SC': 36, 'OK': 35, 'NJ': 34, 'AL': 29,
+  'WA': 29, 'MD': 29, 'MI': 25, 'MN': 21, 'OH': 20,
+  'CO': 18, 'OR': 15, 'MO': 14, 'IN': 13, 'CT': 12,
+  'LA': 11, 'KY': 10, 'AZ': 9, 'WI': 8, 'AR': 7,
+  'MS': 7, 'KS': 6, 'NM': 5, 'IA': 5, 'NE': 4,
+  'UT': 4, 'NV': 3, 'ID': 3, 'ME': 3, 'NH': 3,
+  'VT': 2, 'RI': 2, 'DE': 2, 'MT': 1, 'WV': 1,
+  'ND': 1, 'SD': 1, 'WY': 1, 'AK': 1, 'HI': 1
+};
+
+// Calculate max for color scaling
+const maxStudents = Math.max(...Object.values(geographicData));
+const totalStudents = Object.values(geographicData).reduce((a, b) => a + b, 0);
+
+// ============================================================================
+// HTML TEMPLATE
+// ============================================================================
+
+function createGeographicMapHTML() {
+  return `
+    <style>
+      .geo-map-container {
+        background: white;
+        border-radius: 16px;
+        padding: 2.5rem;
+        border: 1px solid rgba(30, 37, 48, 0.06);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.02);
+      }
+      
+      .geo-map-header {
+        margin-bottom: 2rem;
+      }
+      
+      .geo-map-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.5px;
+      }
+      
+      .geo-map-subtitle {
+        color: #6b7280;
+        font-size: 1rem;
+      }
+      
+      .map-wrapper {
+        position: relative;
+        background: var(--cream);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+      }
+      
+      .us-map {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        display: block;
+      }
+      
+      .us-map path {
+        fill: #e5e7eb;
+        stroke: white;
+        stroke-width: 1.5;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      
+      .us-map path:hover {
+        stroke: var(--primary);
+        stroke-width: 2;
+        filter: brightness(0.95);
+      }
+      
+      .state-tooltip {
+        position: absolute;
+        background: var(--dark);
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 1000;
+        white-space: nowrap;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      }
+      
+      .state-tooltip.active {
+        opacity: 1;
+      }
+      
+      .tooltip-state {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+      }
+      
+      .tooltip-students {
+        font-size: 0.85rem;
+        color: #fbbf24;
+      }
+      
+      .map-legend {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+      }
+      
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: #6b7280;
+      }
+      
+      .legend-color {
+        width: 24px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1px solid rgba(0,0,0,0.1);
+      }
+      
+      .top-states-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+      
+      .top-state-card {
+        background: var(--cream);
+        padding: 1.25rem;
+        border-radius: 10px;
+        border: 1px solid rgba(30, 37, 48, 0.04);
+        transition: all 0.3s;
+      }
+      
+      .top-state-card:hover {
+        background: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        transform: translateY(-2px);
+      }
+      
+      .top-state-rank {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+      }
+      
+      .top-state-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--dark);
+        margin-bottom: 0.25rem;
+      }
+      
+      .top-state-count {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--primary);
+        letter-spacing: -0.5px;
+      }
+      
+      .top-state-percent {
+        font-size: 0.8rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+      }
+    </style>
+    
+    <div class="geo-map-container">
+      <div class="geo-map-header">
+        <h2 class="geo-map-title">Geographic Reach</h2>
+        <p class="geo-map-subtitle">Student distribution across the United States</p>
+      </div>
+      
+      <div class="map-wrapper">
+        <svg class="us-map" viewBox="0 0 960 600" id="usMap">
+          <!-- Map will be populated by JavaScript -->
+        </svg>
+        <div class="state-tooltip" id="stateTooltip">
+          <div class="tooltip-state"></div>
+          <div class="tooltip-students"></div>
+        </div>
+        
+        <div class="map-legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background: #fef3f2;"></div>
+            <span>1-10 students</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #fdd8c7;"></div>
+            <span>11-50 students</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #f4a582;"></div>
+            <span>51-100 students</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #d46843;"></div>
+            <span>101-200 students</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background: #c84826;"></div>
+            <span>200+ students</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="top-states-grid" id="topStatesGrid"></div>
+    </div>
+  `;
+}
+
+// ============================================================================
+// STATE ABBREVIATIONS TO FULL NAMES
+// ============================================================================
+
+const stateNames = {
+  'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+  'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+  'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+  'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+  'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri',
+  'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
+  'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio',
+  'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+  'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
+  'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming'
+};
+
+// ============================================================================
+// COLOR SCALE FUNCTION
+// ============================================================================
+
+function getStateColor(students) {
+  if (!students || students === 0) return '#e5e7eb';
+  if (students <= 10) return '#fef3f2';
+  if (students <= 50) return '#fdd8c7';
+  if (students <= 100) return '#f4a582';
+  if (students <= 200) return '#d46843';
+  return '#c84826';
+}
+
+// ============================================================================
+// SIMPLIFIED US MAP PATHS (Key states for readability)
+// ============================================================================
+
+// Using a simplified map - for production, use actual SVG paths or library like D3.js
+const statePositions = {
+  'WA': {x: 70, y: 50}, 'OR': {x: 60, y: 120}, 'CA': {x: 50, y: 200}, 'NV': {x: 100, y: 180},
+  'ID': {x: 130, y: 90}, 'MT': {x: 180, y: 50}, 'WY': {x: 180, y: 120}, 'UT': {x: 130, y: 180},
+  'AZ': {x: 130, y: 260}, 'NM': {x: 180, y: 260}, 'CO': {x: 230, y: 180}, 'ND': {x: 280, y: 50},
+  'SD': {x: 280, y: 110}, 'NE': {x: 280, y: 170}, 'KS': {x: 310, y: 220}, 'OK': {x: 330, y: 280},
+  'TX': {x: 320, y: 360}, 'MN': {x: 360, y: 70}, 'IA': {x: 370, y: 150}, 'MO': {x: 400, y: 210},
+  'AR': {x: 420, y: 280}, 'LA': {x: 440, y: 350}, 'WI': {x: 430, y: 90}, 'IL': {x: 450, y: 170},
+  'MI': {x: 510, y: 110}, 'IN': {x: 490, y: 180}, 'OH': {x: 540, y: 170}, 'KY': {x: 520, y: 220},
+  'TN': {x: 520, y: 260}, 'MS': {x: 470, y: 310}, 'AL': {x: 510, y: 310}, 'WV': {x: 590, y: 200},
+  'VA': {x: 640, y: 210}, 'NC': {x: 650, y: 260}, 'SC': {x: 630, y: 300}, 'GA': {x: 580, y: 320},
+  'FL': {x: 620, y: 390}, 'PA': {x: 640, y: 160}, 'NY': {x: 700, y: 120}, 'VT': {x: 720, y: 80},
+  'NH': {x: 740, y: 90}, 'ME': {x: 760, y: 50}, 'MA': {x: 760, y: 120}, 'RI': {x: 770, y: 130},
+  'CT': {x: 750, y: 140}, 'NJ': {x: 710, y: 170}, 'DE': {x: 700, y: 190}, 'MD': {x: 680, y: 200}
+};
+
+// ============================================================================
+// RENDER FUNCTIONS
+// ============================================================================
+
+function renderSimplifiedMap() {
+  const svg = document.getElementById('usMap');
+  if (!svg) return;
+  
+  let mapHTML = '';
+  
+  // Create simplified state representations (circles)
+  Object.entries(statePositions).forEach(([state, pos]) => {
+    const students = geographicData[state] || 0;
+    const color = getStateColor(students);
+    const size = students > 100 ? 35 : students > 50 ? 28 : students > 10 ? 22 : 18;
+    
+    mapHTML += `
+      <g class="state-group" data-state="${state}" data-students="${students}">
+        <circle 
+          cx="${pos.x}" 
+          cy="${pos.y}" 
+          r="${size}" 
+          fill="${color}" 
+          stroke="white" 
+          stroke-width="2"
+          style="cursor: pointer; transition: all 0.3s;"
+          onmouseover="showStateTooltip(event, '${state}', ${students})"
+          onmouseout="hideStateTooltip()"
+        />
+        <text 
+          x="${pos.x}" 
+          y="${pos.y + 4}" 
+          text-anchor="middle" 
+          font-size="11" 
+          font-weight="600" 
+          fill="${students > 100 ? 'white' : '#1e2530'}"
+          pointer-events="none"
+        >${state}</text>
+      </g>
+    `;
+  });
+  
+  svg.innerHTML = mapHTML;
+}
+
+function showStateTooltip(event, stateCode, students) {
+  const tooltip = document.getElementById('stateTooltip');
+  if (!tooltip) return;
+  
+  const stateName = stateNames[stateCode] || stateCode;
+  const percent = ((students / totalStudents) * 100).toFixed(1);
+  
+  tooltip.querySelector('.tooltip-state').textContent = stateName;
+  tooltip.querySelector('.tooltip-students').textContent = 
+    `${students.toLocaleString()} students (${percent}%)`;
+  
+  tooltip.style.left = (event.pageX + 15) + 'px';
+  tooltip.style.top = (event.pageY - 50) + 'px';
+  tooltip.classList.add('active');
+}
+
+function hideStateTooltip() {
+  const tooltip = document.getElementById('stateTooltip');
+  if (tooltip) {
+    tooltip.classList.remove('active');
+  }
+}
+
+function renderTopStates() {
+  const container = document.getElementById('topStatesGrid');
+  if (!container) return;
+  
+  const topStates = Object.entries(geographicData)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10);
+  
+  container.innerHTML = topStates.map(([state, count], index) => {
+    const stateName = stateNames[state] || state;
+    const percent = ((count / totalStudents) * 100).toFixed(1);
+    
+    return `
+      <div class="top-state-card">
+        <div class="top-state-rank">#${index + 1}</div>
+        <div class="top-state-name">${stateName}</div>
+        <div class="top-state-count">${count.toLocaleString()}</div>
+        <div class="top-state-percent">${percent}% of total</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
+function initializeGeographicMap() {
+  // Insert map into Partners > Geographic tab
+  const geoSection = document.getElementById('partners-geographic');
+  if (geoSection) {
+    // Remove existing content and replace with map
+    const existingCards = geoSection.querySelectorAll('.stat-grid, .card');
+    existingCards.forEach(card => card.remove());
+    
+    geoSection.insertAdjacentHTML('beforeend', createGeographicMapHTML());
+    renderSimplifiedMap();
+    renderTopStates();
+  }
+}
+
+// Make tooltip functions global
+window.showStateTooltip = showStateTooltip;
+window.hideStateTooltip = hideStateTooltip;
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeGeographicMap);
+} else {
+  // If called after DOMContentLoaded, wait a bit for main scripts
+  setTimeout(initializeGeographicMap, 1500);
+}
+
+console.log('🗺️  Geographic Heat Map Module Loaded');
+console.log('📍 Total States:', Object.keys(geographicData).length);
+console.log('👥 Total Students Tracked:', totalStudents.toLocaleString());
+console.log('🏆 Top State: Georgia with', geographicData.GA.toLocaleString(), 'students');
+  </script>
+</body>
+</html>
